@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "lox": {
+      "commandName": "Project",
+      "commandLineArgs": "D:\\repos\\lox\\lox\\Lox.cs"
+    }
+  }
+}
