@@ -20,7 +20,7 @@ namespace tool
             string[] types ={
                 "Binary: Expr left, Token oper, Expr right",
                 "Grouping: Expr expression",
-                "Literal  : object value",
+                "Literal  : object? value",
                 "Unary: Token oper, Expr right",
             };
             defineAst(outputDir, "Expr", types);

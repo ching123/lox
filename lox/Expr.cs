@@ -45,7 +45,7 @@ namespace lox
         }
         public class Literal : Expr
         {
-            public Literal(object value)
+            public Literal(object? value)
             {
                 this.value = value;
             }
@@ -53,7 +53,7 @@ namespace lox
             {
                 return visitor.visitLiteralExpr(this);
             }
-            public readonly object value;
+            public readonly object? value;
         }
         public class Unary : Expr
         {

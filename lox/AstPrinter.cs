@@ -20,8 +20,10 @@ namespace lox
 
             Console.WriteLine(new AstPrinter().print(expression));
         }
-        public string print(Expr expression)
+        public string print(Expr? expression)
         {
+            if (expression == null) return String.Empty;
+
             return expression.accept(this);
         }
         public string visitBinaryExpr(Expr.Binary expr)
