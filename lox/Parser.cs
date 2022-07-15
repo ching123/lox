@@ -27,7 +27,29 @@ namespace lox
         {
             this.tokens = tokens;
         }
-        public Expr? parse()
+        public List<Stmt> parse()
+        {
+            try
+            {
+                List<Stmt> statements = new List<Stmt>();
+                while(!isEnd())
+                {
+                    var statement = declaration();
+                    if (statement != null)
+                    {
+                        statements.Add(statement);
+                    }
+                }
+
+                return statements;
+            }
+            catch (ParseError ex)
+            {
+                Console.WriteLine(ex.Message);
+                return new List<Stmt>();
+            }
+        }
+        public Expr? parseExpression()
         {
             try
             {
@@ -39,9 +61,81 @@ namespace lox
                 return null;
             }
         }
+        private Stmt? declaration()
+        {
+            try
+            {
+                if (match(TokenType.VAR)) return varDeclaration();
+                return statement();
+            }
+            catch (ParseError)
+            {
+                synchronize();
+                return null;
+            }
+        }
+        private Stmt statement()
+        {
+            if (match(TokenType.PRINT)) return printStatement();
+            if (match(TokenType.LEFT_BRACE)) return new Stmt.Block(block());
+            return expressionStatement();
+        }
+        private List<Stmt> block()
+        {
+            List<Stmt> statements = new List<Stmt>();
+            while(!check(TokenType.RIGHT_BRACE) && !isEnd())
+            {
+                var statement = declaration();
+                if (statement != null)
+                {
+                    statements.Add(statement);
+                }
+            }
+            consume(TokenType.RIGHT_BRACE, "Expect '}' after block.");
+            return statements;
+        }
+        private Stmt varDeclaration()
+        {
+            var name = consume(TokenType.IDENTIFIER, "Expect variable name.");
+            Expr? initializer = null;
+            if (match(TokenType.EQUAL))
+            {
+                initializer = expression();
+            }
+            consume(TokenType.SEMICOLON, "Expect ';' after variable declaration.");
+            return new Stmt.Var(name, initializer);
+        }
+        private Stmt printStatement()
+        {
+            var value = expression();
+            consume(TokenType.SEMICOLON, "Expect ';' after value.");
+            return new Stmt.Print(value);
+        }
+        private Stmt expressionStatement()
+        {
+            var expr = expression();
+            consume(TokenType.SEMICOLON, "Expect ';' after expression.");
+            return new Stmt.Expression(expr);
+        }
         private Expr expression()
         {
-            return equality();
+            return assignment();
+        }
+        private Expr assignment()
+        {
+            var expr = equality();
+            if(match(TokenType.EQUAL))
+            {
+                var prev = previous();
+                var value = assignment();
+                if (expr is Expr.Variable)
+                {
+                    var name = ((Expr.Variable)expr).name;
+                    return new Expr.Assign(name, value);
+                }
+                error(prev, "Invalid assignment target.");
+            }
+            return expr;
         }
         private Expr equality()
         {
@@ -109,6 +203,7 @@ namespace lox
                 consume(TokenType.RIGHT_PAREN, "Expect ')' after expression.");
                 return new Expr.Grouping(expr);
             }
+            else if (match(TokenType.IDENTIFIER)) return new Expr.Variable(previous());
 
             throw error(peek(), "Expect expression.");
         }

@@ -59,7 +59,7 @@ namespace lox
                 case '}':addToken(TokenType.RIGHT_BRACE);break;
                 case ',':addToken(TokenType.COMMA);break;
                 case '.':addToken(TokenType.DOT);break;
-                case ';':addToken(TokenType.COMMA);break;
+                case ';':addToken(TokenType.SEMICOLON);break;
                 case '+':addToken(TokenType.PLUS);break;
                 case'-':addToken(TokenType.MINUS);break;
                 case '*':addToken(TokenType.STAR);break;

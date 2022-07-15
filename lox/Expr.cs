@@ -10,10 +10,26 @@ namespace lox
     {
         public interface Visitor<R>
         {
+            public R visitAssignExpr(Assign expr);
             public R visitBinaryExpr(Binary expr);
             public R visitGroupingExpr(Grouping expr);
             public R visitLiteralExpr(Literal expr);
             public R visitUnaryExpr(Unary expr);
+            public R visitVariableExpr(Variable expr);
+        }
+        public class Assign : Expr
+        {
+            public Assign(Token name, Expr value)
+            {
+                this.name = name;
+                this.value = value;
+            }
+            public override R accept<R>(Visitor<R> visitor)
+            {
+                return visitor.visitAssignExpr(this);
+            }
+            public readonly Token name;
+            public readonly Expr value;
         }
         public class Binary : Expr
         {
@@ -68,6 +84,18 @@ namespace lox
             }
             public readonly Token oper;
             public readonly Expr right;
+        }
+        public class Variable : Expr
+        {
+            public Variable(Token name)
+            {
+                this.name = name;
+            }
+            public override R accept<R>(Visitor<R> visitor)
+            {
+                return visitor.visitVariableExpr(this);
+            }
+            public readonly Token name;
         }
         public abstract R accept<R>(Visitor<R> visitor);
     }

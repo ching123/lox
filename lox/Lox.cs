@@ -8,7 +8,9 @@ namespace lox
 {
     public class Lox
     {
+        static Interpreter interpreter = new Interpreter();
         static bool hadError = false;
+        static bool hadRuntimeError = false;
         public static void main(string[] args)
         {
             if (args.Length > 1)
@@ -29,6 +31,9 @@ namespace lox
         {
             var text = File.ReadAllText(path, Encoding.UTF8);
             run(text);
+
+            if (hadError) Environment.Exit(65);
+            if (hadRuntimeError) Environment.Exit(70);
         }
         private static void runPrompt()
         {
@@ -39,17 +44,23 @@ namespace lox
             var scanner = new Scanner(source);
             var tokens = scanner.scanTokens();
             var parser = new Parser(tokens);
-            var expression = parser.parse();
-            
-            if (hadError) return;
-            
-            Console.WriteLine($"{new AstPrinter().print(expression)}\n");
+            var statements = parser.parse();
 
-            return;
-            foreach (var token in tokens)
-            {
-                Console.WriteLine($"{token.toString()}\n");
-            }
+            if (hadError) return;
+
+            interpreter.interpret(statements);
+            
+            //Console.WriteLine($"{new AstPrinter().print(expression)}\n");
+
+            //foreach (var token in tokens)
+            //{
+            //    Console.WriteLine($"{token.toString()}\n");
+            //}
+        }
+        public static void runtimeError(RuntimeError error)
+        {
+            Console.WriteLine($"{error.Message}\n[line {error.token.line}]");
+            hadRuntimeError = true;
         }
         public static void error(int line, string message)
         {

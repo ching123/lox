@@ -18,12 +18,20 @@ namespace tool
 
             var outputDir = args[0];
             string[] types ={
+                "Assign: Token name, Expr value",
                 "Binary: Expr left, Token oper, Expr right",
                 "Grouping: Expr expression",
                 "Literal  : object? value",
                 "Unary: Token oper, Expr right",
+                "Variable: Token name"
             };
             defineAst(outputDir, "Expr", types);
+            defineAst(outputDir, "Stmt", new List<string>{
+                "Block: List<Stmt> statements",
+                "Expression: Expr expression",
+                "Print: Expr expression",
+                "Var: Token name, Expr? initalizer",
+            });
         }
         private static void defineAst(string outputDir, string baseName, IList<string> types)
         {

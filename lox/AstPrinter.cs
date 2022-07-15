@@ -26,27 +26,39 @@ namespace lox
 
             return expression.accept(this);
         }
+
+        public string visitAssignExpr(Expr.Assign expr)
+        {
+            throw new NotImplementedException();
+        }
+
         public string visitBinaryExpr(Expr.Binary expr)
         {
             return parenthesize(expr.oper.lexeme, expr.left, expr.right);
-            return $"({expr.left.accept(this)}{expr.oper.lexeme}{expr.right.accept(this)})";
+            //return $"({expr.left.accept(this)}{expr.oper.lexeme}{expr.right.accept(this)})";
         }
 
         public string visitGroupingExpr(Expr.Grouping expr)
         {
             return parenthesize("group", expr.expression);
-            return $"({expr.expression.accept(this)})";
+            //return $"({expr.expression.accept(this)})";
         }
         public string visitLiteralExpr(Expr.Literal expr)
         {
-            return expr.value == null ? "Nil" : expr.value.ToString();
-            return $"({expr.value.ToString()})";
+            return (expr.value?.ToString()) ?? "Nil";
+            //return $"({expr.value.ToString()})";
         }
         public string visitUnaryExpr(Expr.Unary expr)
         {
             return parenthesize(expr.oper.lexeme, expr.right);
-            return $"({expr.oper.lexeme}{expr.right.accept(this)})";
+            //return $"({expr.oper.lexeme}{expr.right.accept(this)})";
         }
+
+        public string visitVariableExpr(Expr.Variable expr)
+        {
+            throw new NotImplementedException();
+        }
+
         private string parenthesize(string name, params Expr[] exprs)
         {
             StringBuilder builder = new StringBuilder();

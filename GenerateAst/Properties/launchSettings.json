@@ -2,7 +2,7 @@
   "profiles": {
     "GenerateAst": {
       "commandName": "Project",
-      "commandLineArgs": "D:\\repos\\lox\\lox"
+      "commandLineArgs": "D:\\repos_\\lox\\lox"
     }
   }
 }

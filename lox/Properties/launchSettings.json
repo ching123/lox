@@ -2,7 +2,7 @@
   "profiles": {
     "lox": {
       "commandName": "Project",
-      "commandLineArgs": "D:\\repos_\\lox\\lox\\Lox.cs"
+      "commandLineArgs": "D:\\repos_\\lox\\lox\\test.txt"
     }
   }
 }
