@@ -21,7 +21,8 @@ namespace tool
                 "Assign: Token name, Expr value",
                 "Binary: Expr left, Token oper, Expr right",
                 "Grouping: Expr expression",
-                "Literal  : object? value",
+                "Literal: object? value",
+                "Logical: Expr left, Token oper, Expr right",
                 "Unary: Token oper, Expr right",
                 "Variable: Token name"
             };
@@ -29,8 +30,10 @@ namespace tool
             defineAst(outputDir, "Stmt", new List<string>{
                 "Block: List<Stmt> statements",
                 "Expression: Expr expression",
+                "If: Expr condition, Stmt thenBrance, Stmt? elseBranch",
                 "Print: Expr expression",
                 "Var: Token name, Expr? initalizer",
+                "While: Expr condition, Stmt body",
             });
         }
         private static void defineAst(string outputDir, string baseName, IList<string> types)

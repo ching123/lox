@@ -3,19 +3,32 @@ program        ¡ú declaration* EOF ;
 declaration    ¡ú varDecl
                | statement ;
 
+varDecl        ¡ú "var" IDENTIFIER ( "=" expression )? ";" ;
+
 statement      ¡ú exprStmt
+               | forStmt
+               | ifStmt
                | printStmt
+               | whileStmt
                | block ;
 
-block          ¡ú "{" declaration* "}" ;
 
 exprStmt       ¡ú expression ";" ;
+forStmt        ¡ú "for" "(" ( varDecl | exprStmt | ";" )
+                 expression? ";"
+                 expression? ")" statement ;
+ifStmt         ¡ú "if" "(" expression ")" statement
+               ( "else" statement )? ;
 printStmt      ¡ú "print" expression ";" ;
+whileStmt      ¡ú "while" "(" expression ")" statement ;
+block          ¡ú "{" declaration* "}" ;
 
 #expression     ¡ú equality ;
 expression     ¡ú assignment ;
 assignment     ¡ú IDENTIFIER "=" assignment
-               | equality ;
+               | logic_or ;
+logic_or       ¡ú logic_and ( "or" logic_and )* ;
+logic_and      ¡ú equality ( "and" equality )* ;
 equality       ¡ú comparison(( "!=" | "==" ) comparison )* ;
 comparison     ¡ú term(( ">" | ">=" | "<" | "<=" ) term )* ;
 term           ¡ú factor(( "-" | "+" ) factor )* ;

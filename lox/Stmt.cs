@@ -12,8 +12,10 @@ namespace lox
         {
             public R visitBlockStmt(Block expr);
             public R visitExpressionStmt(Expression expr);
+            public R visitIfStmt(If expr);
             public R visitPrintStmt(Print expr);
             public R visitVarStmt(Var expr);
+            public R visitWhileStmt(While expr);
         }
         public class Block : Stmt
         {
@@ -38,6 +40,22 @@ namespace lox
                 return visitor.visitExpressionStmt(this);
             }
             public readonly Expr expression;
+        }
+        public class If : Stmt
+        {
+            public If(Expr condition, Stmt thenBrance, Stmt? elseBranch)
+            {
+                this.condition = condition;
+                this.thenBrance = thenBrance;
+                this.elseBranch = elseBranch;
+            }
+            public override R accept<R>(Visitor<R> visitor)
+            {
+                return visitor.visitIfStmt(this);
+            }
+            public readonly Expr condition;
+            public readonly Stmt thenBrance;
+            public readonly Stmt? elseBranch;
         }
         public class Print : Stmt
         {
@@ -64,6 +82,20 @@ namespace lox
             }
             public readonly Token name;
             public readonly Expr? initalizer;
+        }
+        public class While : Stmt
+        {
+            public While(Expr condition, Stmt body)
+            {
+                this.condition = condition;
+                this.body = body;
+            }
+            public override R accept<R>(Visitor<R> visitor)
+            {
+                return visitor.visitWhileStmt(this);
+            }
+            public readonly Expr condition;
+            public readonly Stmt body;
         }
         public abstract R accept<R>(Visitor<R> visitor);
     }

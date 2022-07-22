@@ -236,5 +236,42 @@ namespace lox
             executeBlock(expr.statements, new Env(this.environmen));
             return null;
         }
+
+        public object? visitIfStmt(Stmt.If expr)
+        {
+            if (isTruthy(evaluate(expr.condition)))
+            {
+                execute(expr.thenBrance);
+            }
+            else if (expr.elseBranch != null)
+            {
+                execute(expr.elseBranch);
+            }
+            return null;
+        }
+
+        public object? visitLogicalExpr(Expr.Logical expr)
+        {
+            var left = evaluate(expr.left);
+            if (expr.oper.type == TokenType.OR)
+            {
+                if (isTruthy(left)) return left;
+            }
+            else
+            {
+                if (!isTruthy(left)) return left;
+            }
+            
+            return evaluate(expr.right);
+        }
+
+        public object? visitWhileStmt(Stmt.While expr)
+        {
+            while (isTruthy(evaluate(expr.condition)))
+            {
+                execute(expr.body);
+            }
+            return null;
+        }
     }
 }

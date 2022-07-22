@@ -33,7 +33,7 @@ namespace lox
         {
             if (values.ContainsKey(name.lexeme))
             {
-                values.Add(name.lexeme, value);
+                values[name.lexeme] = value;
                 return;
             }
             if (enclosing != null)

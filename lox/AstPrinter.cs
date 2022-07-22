@@ -48,6 +48,12 @@ namespace lox
             return (expr.value?.ToString()) ?? "Nil";
             //return $"({expr.value.ToString()})";
         }
+
+        public string visitLogicalExpr(Expr.Logical expr)
+        {
+            throw new NotImplementedException();
+        }
+
         public string visitUnaryExpr(Expr.Unary expr)
         {
             return parenthesize(expr.oper.lexeme, expr.right);
