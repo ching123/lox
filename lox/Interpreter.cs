@@ -8,7 +8,12 @@ namespace lox
 {
     public class Interpreter : Expr.Visitor<object?>, Stmt.Visitor<object?>
     {
-        private Env environmen = new Env();
+        public static readonly Env globals = new Env();
+        private Env environmen = globals;
+        public Interpreter()
+        {
+            globals.define("clock", new Clock());
+        }
         public void interpret(List<Stmt> statements)
         {
             try
@@ -97,21 +102,21 @@ namespace lox
                     {
                         checkNumberOperands(expr.oper, left, right);
                         if (left != null && right != null)
-                            return (double)left < (double)right;
+                            return (double)left <= (double)right;
                         break;
                     }
                 case TokenType.GREATER:
                     {
                         checkNumberOperands(expr.oper, left, right);
                         if (left != null && right != null)
-                            return (double)left < (double)right;
+                            return (double)left > (double)right;
                         break;
                     }
                 case TokenType.GREATER_EQUAL:
                     {
                         checkNumberOperands(expr.oper, left, right);
                         if (left != null && right != null)
-                            return (double)left < (double)right;
+                            return (double)left >= (double)right;
                         break;
                     }
                 case TokenType.BANG_EQUAL:return !isEqual(expr.left, expr.right);
@@ -161,7 +166,7 @@ namespace lox
         {
             return expr?.accept(this);
         }
-        private void executeBlock(List<Stmt> statements, Env envirenment)
+        public void executeBlock(List<Stmt> statements, Env envirenment)
         {
             var previous = this.environmen;
             try
@@ -272,6 +277,40 @@ namespace lox
                 execute(expr.body);
             }
             return null;
+        }
+
+        public object? visitCallExpr(Expr.Call expr)
+        {
+            var callee = evaluate(expr.callee);
+            if (!(callee is LoxCallable))
+                throw new RuntimeError(expr.paren, "Can only call functions and classes.");
+            LoxCallable function = (LoxCallable)callee;
+            if (function.arity() != expr.arguments.Count())
+                throw new RuntimeError(expr.paren, $"Expected {function.arity()} arguments but got ${expr.arguments.Count()}.");
+            
+            List<object?> arguments = new List<object?>();
+            foreach (var argument in expr.arguments)
+            {
+                arguments.Add(evaluate(argument));
+            }
+            return function.call(this, arguments);
+        }
+
+        public object? visitFunctionStmt(Stmt.Function expr)
+        {
+            var function = new LoxFunction(expr, environmen);
+            environmen.define(expr.name.lexeme, function);
+            return null;
+        }
+
+        public object? visitReturnStmt(Stmt.Return expr)
+        {
+            object? val = null;
+            if (expr.value != null)
+            {
+                val = evaluate(expr.value);
+            }
+            throw new Return(val);
         }
     }
 }

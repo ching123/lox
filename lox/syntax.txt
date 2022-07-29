@@ -1,7 +1,11 @@
 program        ¡ú declaration* EOF ;
 
-declaration    ¡ú varDecl
+declaration    ¡ú funDecl
+               | varDecl
                | statement ;
+
+funDecl        ¡ú "fun" function ;
+function       ¡ú IDENTIFIER "(" parameters? ")" block ;
 
 varDecl        ¡ú "var" IDENTIFIER ( "=" expression )? ";" ;
 
@@ -9,6 +13,7 @@ statement      ¡ú exprStmt
                | forStmt
                | ifStmt
                | printStmt
+               | returnStmt
                | whileStmt
                | block ;
 
@@ -19,8 +24,10 @@ forStmt        ¡ú "for" "(" ( varDecl | exprStmt | ";" )
                  expression? ")" statement ;
 ifStmt         ¡ú "if" "(" expression ")" statement
                ( "else" statement )? ;
+returnStmt     ¡ú "return" expression? ";" ;
 printStmt      ¡ú "print" expression ";" ;
 whileStmt      ¡ú "while" "(" expression ")" statement ;
+parameters     ¡ú IDENTIFIER ( "," IDENTIFIER )* ;
 block          ¡ú "{" declaration* "}" ;
 
 #expression     ¡ú equality ;
@@ -33,8 +40,10 @@ equality       ¡ú comparison(( "!=" | "==" ) comparison )* ;
 comparison     ¡ú term(( ">" | ">=" | "<" | "<=" ) term )* ;
 term           ¡ú factor(( "-" | "+" ) factor )* ;
 factor         ¡ú unary(( "/" | "*" ) unary )* ;
-unary          ¡ú ( "!" | "-" ) unary
-               | primary ;
+unary          ¡ú ( "!" | "-" ) unary | call ;
+call           ¡ú primary ( "(" arguments? ")" )* ;
 primary        ¡ú NUMBER | STRING | "true" | "false" | "nil"
                | "(" expression ")"
                | IDENTIFIER ;
+
+arguments      ¡ú expression ( "," expression )* ;

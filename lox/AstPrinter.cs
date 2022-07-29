@@ -38,6 +38,11 @@ namespace lox
             //return $"({expr.left.accept(this)}{expr.oper.lexeme}{expr.right.accept(this)})";
         }
 
+        public string visitCallExpr(Expr.Call expr)
+        {
+            throw new NotImplementedException();
+        }
+
         public string visitGroupingExpr(Expr.Grouping expr)
         {
             return parenthesize("group", expr.expression);

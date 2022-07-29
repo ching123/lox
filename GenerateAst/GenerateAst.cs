@@ -20,6 +20,7 @@ namespace tool
             string[] types ={
                 "Assign: Token name, Expr value",
                 "Binary: Expr left, Token oper, Expr right",
+                "Call: Expr callee, Token paren, List<Expr> arguments",
                 "Grouping: Expr expression",
                 "Literal: object? value",
                 "Logical: Expr left, Token oper, Expr right",
@@ -30,8 +31,10 @@ namespace tool
             defineAst(outputDir, "Stmt", new List<string>{
                 "Block: List<Stmt> statements",
                 "Expression: Expr expression",
+                "Function: Token name, List<Token> parameters, List<Stmt> body",
                 "If: Expr condition, Stmt thenBrance, Stmt? elseBranch",
                 "Print: Expr expression",
+                "Return: Token keyword, Expr? value",
                 "Var: Token name, Expr? initalizer",
                 "While: Expr condition, Stmt body",
             });
