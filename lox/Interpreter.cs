@@ -9,7 +9,7 @@ namespace lox
     public class Interpreter : Expr.Visitor<object?>, Stmt.Visitor<object?>
     {
         public static readonly Env globals = new Env();
-        private Env environmen = globals;
+        private Env environment = globals;
         public Interpreter()
         {
             globals.define("clock", new Clock());
@@ -168,10 +168,10 @@ namespace lox
         }
         public void executeBlock(List<Stmt> statements, Env envirenment)
         {
-            var previous = this.environmen;
+            var previous = this.environment;
             try
             {
-                this.environmen = envirenment;
+                this.environment = envirenment;
 
                 foreach (var statement in statements)
                 {
@@ -180,7 +180,7 @@ namespace lox
             }
             finally
             {
-                this.environmen = previous;
+                this.environment = previous;
             }
         }
         private void execute(Stmt stmt)
@@ -215,7 +215,7 @@ namespace lox
 
         public object? visitVariableExpr(Expr.Variable expr)
         {
-            return environmen.get(expr.name);
+            return environment.get(expr.name);
         }
 
         public object? visitVarStmt(Stmt.Var expr)
@@ -225,20 +225,20 @@ namespace lox
             {
                 value = evaluate(expr.initalizer);
             }
-            environmen.define(expr.name.lexeme, value);
+            environment.define(expr.name.lexeme, value);
             return null;
         }
 
         public object? visitAssignExpr(Expr.Assign expr)
         {
             var value = evaluate(expr.value);
-            environmen.assign(expr.name, value);
+            environment.assign(expr.name, value);
             return value;
         }
 
         public object? visitBlockStmt(Stmt.Block expr)
         {
-            executeBlock(expr.statements, new Env(this.environmen));
+            executeBlock(expr.statements, new Env(this.environment));
             return null;
         }
 
@@ -298,8 +298,8 @@ namespace lox
 
         public object? visitFunctionStmt(Stmt.Function expr)
         {
-            var function = new LoxFunction(expr, environmen);
-            environmen.define(expr.name.lexeme, function);
+            var function = new LoxFunction(expr, environment);
+            environment.define(expr.name.lexeme, function);
             return null;
         }
 
