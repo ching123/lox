@@ -10,6 +10,7 @@ namespace lox
     {
         public static readonly Env globals = new Env();
         private Env environment = globals;
+        private Dictionary<Expr, int> locals = new Dictionary<Expr, int>();
         public Interpreter()
         {
             globals.define("clock", new Clock());
@@ -152,6 +153,10 @@ namespace lox
 
             return null;
         }
+        public void resolve(Expr expr, int depth)
+        {
+            locals.Add(expr, depth);
+        }
         private void checkNumberOperands(Token oper, object? left, object? right)
         {
             if (left is double && right is double) return;
@@ -215,7 +220,8 @@ namespace lox
 
         public object? visitVariableExpr(Expr.Variable expr)
         {
-            return environment.get(expr.name);
+            return lookupVariable(expr.name, expr);
+            //return environment.get(expr.name);
         }
 
         public object? visitVarStmt(Stmt.Var expr)
@@ -232,7 +238,15 @@ namespace lox
         public object? visitAssignExpr(Expr.Assign expr)
         {
             var value = evaluate(expr.value);
-            environment.assign(expr.name, value);
+            int distance;
+            if (locals.TryGetValue(expr, out distance))
+            {
+                environment.assignAt(distance, expr.name, value);
+            }
+            else
+            {
+                globals.assign(expr.name, value);
+            }
             return value;
         }
 
@@ -311,6 +325,18 @@ namespace lox
                 val = evaluate(expr.value);
             }
             throw new Return(val);
+        }
+        private object? lookupVariable(Token name, Expr expr)
+        {
+            int distance = 0;
+            if (locals.TryGetValue(expr, out distance))
+            {
+                return environment.getAt(distance, name.lexeme);
+            }
+            else
+            {
+                return globals.get(name);
+            }
         }
     }
 }

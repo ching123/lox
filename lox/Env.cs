@@ -25,6 +25,10 @@ namespace lox
 
             throw new RuntimeError(token, $"Undefined variable '{token.lexeme}'.");
         }
+        public object? getAt(int distance, string name)
+        {
+            return ancestor(distance).values[name];
+        }
         public void define(string name, object? value)
         {
             values.Add(name, value);
@@ -42,6 +46,23 @@ namespace lox
                 return;
             }
             throw new RuntimeError(name, $"Undefined variable {name.lexeme}");
+        }
+        public void assignAt(int distance, Token name, object? value)
+        {
+            ancestor(distance).values[name.lexeme] = value;
+        }
+        private Env ancestor(int distance)
+        {
+            var environment = this;
+            for (var i = 0; i < distance; i++)
+            {
+#pragma warning disable CS8602 // Dereference of a possibly null reference.
+                environment = environment.enclosing;
+#pragma warning restore CS8602 // Dereference of a possibly null reference.
+            }
+#pragma warning disable CS8603 // Possible null reference return.
+            return environment;
+#pragma warning restore CS8603 // Possible null reference return.
         }
     }
 }
