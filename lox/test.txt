@@ -23,3 +23,30 @@ fun makeCounter() {
 var counter = makeCounter();
 counter(); // "1".
 counter(); // "2".
+
+class Bacon {
+  init(a) {
+    this.a=a;
+    return;
+    this.b="hello";
+  }
+  eat() {
+    print "Crunch crunch crunch!";
+    print this.a;
+  }
+}
+
+Bacon("constructor").eat(); // Prints "Crunch crunch crunch!".
+
+class Thing {
+  getCallback() {
+    fun localFunction() {
+      print this;
+    }
+
+    return localFunction;
+  }
+}
+
+var callback = Thing().getCallback();
+callback();

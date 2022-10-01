@@ -10,7 +10,6 @@ namespace lox
     {
         int arity();
         object? call(Interpreter interpreter, List<object?> arguments);
-        string toString();
     }
     public class Clock : LoxCallable
     {
@@ -23,8 +22,7 @@ namespace lox
         {
             return DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
         }
-
-        public string toString()
+        public override string ToString()
         {
             return "<native fn>";
         }

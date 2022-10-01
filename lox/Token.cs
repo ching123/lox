@@ -19,9 +19,9 @@ namespace lox
             this.literal = literal;
             this.line = line;
         }
-        public string toString()
+        public override string ToString()
         {
-            return type +" " +this.lexeme+" " + this.literal;
+            return type + " " + this.lexeme + " " + this.literal;
         }
     }
 }

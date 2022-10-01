@@ -1,9 +1,11 @@
 program        ¡ú declaration* EOF ;
 
-declaration    ¡ú funDecl
+declaration    ¡ú classDecl
+               | funDecl
                | varDecl
                | statement ;
 
+classDecl      ¡ú "class" IDENTIFIER "{" function* "}" ;
 funDecl        ¡ú "fun" function ;
 function       ¡ú IDENTIFIER "(" parameters? ")" block ;
 
@@ -32,7 +34,7 @@ block          ¡ú "{" declaration* "}" ;
 
 #expression     ¡ú equality ;
 expression     ¡ú assignment ;
-assignment     ¡ú IDENTIFIER "=" assignment
+assignment     ¡ú ( call "." )? IDENTIFIER "=" assignment
                | logic_or ;
 logic_or       ¡ú logic_and ( "or" logic_and )* ;
 logic_and      ¡ú equality ( "and" equality )* ;
@@ -41,7 +43,7 @@ comparison     ¡ú term(( ">" | ">=" | "<" | "<=" ) term )* ;
 term           ¡ú factor(( "-" | "+" ) factor )* ;
 factor         ¡ú unary(( "/" | "*" ) unary )* ;
 unary          ¡ú ( "!" | "-" ) unary | call ;
-call           ¡ú primary ( "(" arguments? ")" )* ;
+call           ¡ú primary ( "(" arguments? ")" | "." IDENTIFIER )* ;
 primary        ¡ú NUMBER | STRING | "true" | "false" | "nil"
                | "(" expression ")"
                | IDENTIFIER ;

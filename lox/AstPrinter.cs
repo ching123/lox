@@ -43,6 +43,11 @@ namespace lox
             throw new NotImplementedException();
         }
 
+        public string visitGetExpr(Expr.Get expr)
+        {
+            throw new NotImplementedException();
+        }
+
         public string visitGroupingExpr(Expr.Grouping expr)
         {
             return parenthesize("group", expr.expression);
@@ -55,6 +60,16 @@ namespace lox
         }
 
         public string visitLogicalExpr(Expr.Logical expr)
+        {
+            throw new NotImplementedException();
+        }
+
+        public string visitSetExpr(Expr.Set expr)
+        {
+            throw new NotImplementedException();
+        }
+
+        public string visitThisExpr(Expr.This expr)
         {
             throw new NotImplementedException();
         }

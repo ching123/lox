@@ -13,9 +13,12 @@ namespace lox
             public R visitAssignExpr(Assign expr);
             public R visitBinaryExpr(Binary expr);
             public R visitCallExpr(Call expr);
+            public R visitGetExpr(Get expr);
             public R visitGroupingExpr(Grouping expr);
             public R visitLiteralExpr(Literal expr);
             public R visitLogicalExpr(Logical expr);
+            public R visitSetExpr(Set expr);
+            public R visitThisExpr(This expr);
             public R visitUnaryExpr(Unary expr);
             public R visitVariableExpr(Variable expr);
         }
@@ -65,6 +68,20 @@ namespace lox
             public readonly Token paren;
             public readonly List<Expr> arguments;
         }
+        public class Get : Expr
+        {
+            public Get(Expr obj, Token name)
+            {
+                this.obj = obj;
+                this.name = name;
+            }
+            public override R accept<R>(Visitor<R> visitor)
+            {
+                return visitor.visitGetExpr(this);
+            }
+            public readonly Expr obj;
+            public readonly Token name;
+        }
         public class Grouping : Expr
         {
             public Grouping(Expr expression)
@@ -104,6 +121,34 @@ namespace lox
             public readonly Expr left;
             public readonly Token oper;
             public readonly Expr right;
+        }
+        public class Set : Expr
+        {
+            public Set(Expr obj, Token name, Expr value)
+            {
+                this.obj = obj;
+                this.name = name;
+                this.value = value;
+            }
+            public override R accept<R>(Visitor<R> visitor)
+            {
+                return visitor.visitSetExpr(this);
+            }
+            public readonly Expr obj;
+            public readonly Token name;
+            public readonly Expr value;
+        }
+        public class This : Expr
+        {
+            public This(Token keyword)
+            {
+                this.keyword = keyword;
+            }
+            public override R accept<R>(Visitor<R> visitor)
+            {
+                return visitor.visitThisExpr(this);
+            }
+            public readonly Token keyword;
         }
         public class Unary : Expr
         {

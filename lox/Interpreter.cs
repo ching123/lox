@@ -312,7 +312,7 @@ namespace lox
 
         public object? visitFunctionStmt(Stmt.Function expr)
         {
-            var function = new LoxFunction(expr, environment);
+            var function = new LoxFunction(expr, environment, false);
             environment.define(expr.name.lexeme, function);
             return null;
         }
@@ -337,6 +337,48 @@ namespace lox
             {
                 return globals.get(name);
             }
+        }
+
+        public object? visitClassStmt(Stmt.Class expr)
+        {
+            environment.define(expr.name.lexeme, null);
+            var methods = new Dictionary<string, LoxFunction>();
+            foreach (var method in expr.methods)
+            {
+                methods[method.name.lexeme] =
+                    new LoxFunction(method, environment, method.name.lexeme.Equals("init"));
+            }
+            var cls = new LoxClass(expr.name.lexeme, methods);
+            environment.assign(expr.name, cls);
+            return null;
+        }
+
+        public object? visitGetExpr(Expr.Get expr)
+        {
+            var obj = evaluate(expr.obj);
+            if (obj is LoxInstance)
+            {
+                return ((LoxInstance)obj).Get(expr.name);
+            }
+            throw new RuntimeError(expr.name, "only instance have properties.");
+        }
+
+        public object? visitSetExpr(Expr.Set expr)
+        {
+            var obj = evaluate(expr.obj);
+            if (obj is not LoxInstance)
+            {
+                throw new RuntimeError(expr.name, "only instance have fields.");
+            }
+            var value = evaluate(expr.value);
+            var instance = (LoxInstance)(obj);
+            instance.Set(expr.name, value);
+            return value;
+        }
+
+        public object? visitThisExpr(Expr.This expr)
+        {
+            return lookupVariable(expr.keyword, expr);
         }
     }
 }

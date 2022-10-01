@@ -65,6 +65,7 @@ namespace lox
         {
             try
             {
+                if (match(TokenType.CLASS)) return classDeclaration();
                 if (match(TokenType.FUN)) return function("function");
                 if (match(TokenType.VAR)) return varDeclaration();
                 return statement();
@@ -74,6 +75,19 @@ namespace lox
                 synchronize();
                 return null;
             }
+        }
+        private Stmt? classDeclaration()
+        {
+            var name = consume(TokenType.IDENTIFIER, "expect class name.");
+            consume(TokenType.LEFT_BRACE, "expect '{' before class body.");
+
+            List<Stmt.Function> methods = new List<Stmt.Function>();
+            while (!check(TokenType.RIGHT_BRACE) && !isEnd())
+            {
+                methods.Add(function("method"));
+            }
+            consume(TokenType.RIGHT_BRACE, "expect '}' after class body.");
+            return new Stmt.Class(name, methods);
         }
         private Stmt statement()
         {
@@ -99,7 +113,7 @@ namespace lox
             consume(TokenType.RIGHT_BRACE, "Expect '}' after block.");
             return statements;
         }
-        private Stmt function(string kind)
+        private Stmt.Function function(string kind)
         {
             var name = consume(TokenType.IDENTIFIER, $"Expect {kind} name.");
             consume(TokenType.LEFT_PAREN, $"Expect '(' after {kind} name");
@@ -237,6 +251,11 @@ namespace lox
                     var name = ((Expr.Variable)expr).name;
                     return new Expr.Assign(name, value);
                 }
+                else if (expr is Expr.Get)
+                {
+                    var get = (Expr.Get)expr;
+                    return new Expr.Set(get.obj, get.name, value);
+                }
                 error(prev, "Invalid assignment target.");
             }
             return expr;
@@ -326,6 +345,11 @@ namespace lox
                 {
                     expr = finishCall(expr);
                 }
+                else if (match(TokenType.DOT))
+                {
+                    var name = consume(TokenType.IDENTIFIER, "expect property name after '.'.");
+                    expr = new Expr.Get(expr, name);
+                }
                 else
                 {
                     break;
@@ -362,6 +386,7 @@ namespace lox
                 consume(TokenType.RIGHT_PAREN, "Expect ')' after expression.");
                 return new Expr.Grouping(expr);
             }
+            else if (match(TokenType.THIS)) return new Expr.This(previous());
             else if (match(TokenType.IDENTIFIER)) return new Expr.Variable(previous());
 
             throw error(peek(), "Expect expression.");

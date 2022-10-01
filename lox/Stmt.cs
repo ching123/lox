@@ -11,6 +11,7 @@ namespace lox
         public interface Visitor<R>
         {
             public R visitBlockStmt(Block expr);
+            public R visitClassStmt(Class expr);
             public R visitExpressionStmt(Expression expr);
             public R visitFunctionStmt(Function expr);
             public R visitIfStmt(If expr);
@@ -30,6 +31,20 @@ namespace lox
                 return visitor.visitBlockStmt(this);
             }
             public readonly List<Stmt> statements;
+        }
+        public class Class : Stmt
+        {
+            public Class(Token name, List<Stmt.Function> methods)
+            {
+                this.name = name;
+                this.methods = methods;
+            }
+            public override R accept<R>(Visitor<R> visitor)
+            {
+                return visitor.visitClassStmt(this);
+            }
+            public readonly Token name;
+            public readonly List<Stmt.Function> methods;
         }
         public class Expression : Stmt
         {

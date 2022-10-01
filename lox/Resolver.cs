@@ -11,11 +11,19 @@ namespace lox
         private readonly Interpreter interpreter;
         private readonly Stack<Dictionary<string,bool>> scopes = new Stack<Dictionary<string,bool>>();
         private FunctionType currentFunction = FunctionType.NONE;
+        private ClassType currentClass = ClassType.NONE;
 
         private enum FunctionType
         {
             NONE,
             FUNCTION,
+            INITIALIZER,
+            METHOD,
+        }
+        private enum ClassType
+        {
+            NONE,
+            CLASS,
         }
         public Resolver(Interpreter interpreter)
         {
@@ -108,6 +116,10 @@ namespace lox
             }
             if (expr.value != null)
             {
+                if (currentFunction == FunctionType.INITIALIZER)
+                {
+                    Lox.error(expr.keyword, "can not return value from an initializer.");
+                }
                 resolve(expr.value);
             }
             return null;
@@ -212,6 +224,51 @@ namespace lox
             endScope();
 
             currentFunction = enclosingFunction;
+        }
+
+        public int? visitClassStmt(Stmt.Class expr)
+        {
+            var enclosingClass = currentClass;
+            currentClass = ClassType.CLASS;
+
+            declare(expr.name);
+            define(expr.name);
+            beginScope();
+            scopes.Peek()["this"] = true;
+            foreach (var method in expr.methods)
+            {
+                var declaration = (method.name.lexeme.Equals("init")) ?
+                    FunctionType.INITIALIZER : FunctionType.METHOD;
+                resolveFunction(method, declaration);
+            }
+            endScope();
+
+            currentClass = enclosingClass;
+            return null;
+        }
+
+        public int? visitGetExpr(Expr.Get expr)
+        {
+            resolve(expr.obj);
+            return null;
+        }
+
+        public int? visitSetExpr(Expr.Set expr)
+        {
+            resolve(expr.value);
+            resolve(expr.obj);
+            return null;
+        }
+
+        public int? visitThisExpr(Expr.This expr)
+        {
+            if (currentClass == ClassType.NONE)
+            {
+                Lox.error(expr.keyword, "can not use 'this' outside of a class.");
+                return null;
+            }
+            resolveLocal(expr, expr.keyword);
+            return null;
         }
     }
 }

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace lox
 {
+
     public class Lox
     {
         static Interpreter interpreter = new Interpreter();
@@ -59,7 +60,7 @@ namespace lox
 
             //foreach (var token in tokens)
             //{
-            //    Console.WriteLine($"{token.toString()}\n");
+            //    Console.WriteLine($"{token.ToString()}\n");
             //}
         }
         public static void runtimeError(RuntimeError error)

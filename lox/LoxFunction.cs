@@ -8,12 +8,20 @@ namespace lox
 {
     public class LoxFunction : LoxCallable
     {
-        private Stmt.Function declaration;
-        private Env closure;
-        public LoxFunction(Stmt.Function declaration, Env closure)
+        private readonly Stmt.Function declaration;
+        private readonly Env closure;
+        private readonly bool isInitializer;
+        public LoxFunction(Stmt.Function declaration, Env closure, bool isInitlizer)
         {
             this.declaration = declaration;
             this.closure = closure;
+            this.isInitializer = isInitlizer;
+        }
+        public LoxFunction bind(LoxInstance instance)
+        {
+            var environment = new Env(closure);
+            environment.define("this", instance);
+            return new LoxFunction(declaration, environment, isInitializer);
         }
         public int arity()
         {
@@ -33,12 +41,13 @@ namespace lox
             }
             catch (Return ex)
             {
+                if (isInitializer) return closure.getAt(0, "this");
                 return ex.value;
             }
-            return null;
-        }
 
-        public string toString()
+            return isInitializer ? closure.getAt(0, "this") : null;
+        }
+        public override string ToString()
         {
             return $"<fn {declaration.name.lexeme}>";
         }
