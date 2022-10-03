@@ -18,6 +18,7 @@ namespace lox
             public R visitLiteralExpr(Literal expr);
             public R visitLogicalExpr(Logical expr);
             public R visitSetExpr(Set expr);
+            public R visitSuperExpr(Super expr);
             public R visitThisExpr(This expr);
             public R visitUnaryExpr(Unary expr);
             public R visitVariableExpr(Variable expr);
@@ -137,6 +138,20 @@ namespace lox
             public readonly Expr obj;
             public readonly Token name;
             public readonly Expr value;
+        }
+        public class Super : Expr
+        {
+            public Super(Token keyword, Token method)
+            {
+                this.keyword = keyword;
+                this.method = method;
+            }
+            public override R accept<R>(Visitor<R> visitor)
+            {
+                return visitor.visitSuperExpr(this);
+            }
+            public readonly Token keyword;
+            public readonly Token method;
         }
         public class This : Expr
         {

@@ -5,7 +5,8 @@ declaration    ¡ú classDecl
                | varDecl
                | statement ;
 
-classDecl      ¡ú "class" IDENTIFIER "{" function* "}" ;
+classDecl      ¡ú "class" IDENTIFIER ( "<" IDENTIFIER )?
+                 "{" function* "}" ;
 funDecl        ¡ú "fun" function ;
 function       ¡ú IDENTIFIER "(" parameters? ")" block ;
 
@@ -44,8 +45,8 @@ term           ¡ú factor(( "-" | "+" ) factor )* ;
 factor         ¡ú unary(( "/" | "*" ) unary )* ;
 unary          ¡ú ( "!" | "-" ) unary | call ;
 call           ¡ú primary ( "(" arguments? ")" | "." IDENTIFIER )* ;
-primary        ¡ú NUMBER | STRING | "true" | "false" | "nil"
-               | "(" expression ")"
-               | IDENTIFIER ;
+primary        ¡ú "true" | "false" | "nil" | "this"
+               | NUMBER | STRING | IDENTIFIER | "(" expression ")"
+               | "super" "." IDENTIFIER ;
 
 arguments      ¡ú expression ( "," expression )* ;

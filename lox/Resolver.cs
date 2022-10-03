@@ -24,6 +24,7 @@ namespace lox
         {
             NONE,
             CLASS,
+            SUBCLASS,
         }
         public Resolver(Interpreter interpreter)
         {
@@ -233,6 +234,19 @@ namespace lox
 
             declare(expr.name);
             define(expr.name);
+
+            if (expr.superclass != null)
+            {
+                if (expr.name.lexeme.Equals(expr.superclass.name.lexeme))
+                {
+                    Lox.error(expr.superclass.name, "a class can not inherit from itself.");
+                }
+                currentClass = ClassType.SUBCLASS;
+                resolve(expr.superclass);
+                
+                beginScope();
+                scopes.Peek()["super"] = true;
+            }
             beginScope();
             scopes.Peek()["this"] = true;
             foreach (var method in expr.methods)
@@ -242,6 +256,11 @@ namespace lox
                 resolveFunction(method, declaration);
             }
             endScope();
+
+            if (expr.superclass != null)
+            {
+                endScope();
+            }
 
             currentClass = enclosingClass;
             return null;
@@ -267,6 +286,21 @@ namespace lox
                 Lox.error(expr.keyword, "can not use 'this' outside of a class.");
                 return null;
             }
+            resolveLocal(expr, expr.keyword);
+            return null;
+        }
+
+        public int? visitSuperExpr(Expr.Super expr)
+        {
+            if (currentClass == ClassType.NONE)
+            {
+                Lox.error(expr.keyword, "can not use 'super' outside of a class.");
+            }
+            else if (currentClass != ClassType.SUBCLASS)
+            {
+                Lox.error(expr.keyword, "can not use 'super' in a class with no superclass.");
+            }
+
             resolveLocal(expr, expr.keyword);
             return null;
         }

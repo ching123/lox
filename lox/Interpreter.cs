@@ -341,14 +341,39 @@ namespace lox
 
         public object? visitClassStmt(Stmt.Class expr)
         {
+            object? superclass = null;
+            if (expr.superclass != null)
+            {
+                superclass = evaluate(expr.superclass);
+                if (superclass is not LoxClass)
+                {
+                    throw new RuntimeError(expr.superclass.name,
+                        "superclass must be a class.");
+                }
+            }
+
             environment.define(expr.name.lexeme, null);
+
+            var enclosing = environment;
+            if (expr.superclass != null)
+            {
+                environment = new Env(environment);
+                environment.define("super", superclass);
+            }
+
             var methods = new Dictionary<string, LoxFunction>();
             foreach (var method in expr.methods)
             {
                 methods[method.name.lexeme] =
                     new LoxFunction(method, environment, method.name.lexeme.Equals("init"));
             }
-            var cls = new LoxClass(expr.name.lexeme, methods);
+
+            if (expr.superclass != null)
+            {
+                environment = enclosing;
+            }
+
+            var cls = new LoxClass(expr.name.lexeme, (LoxClass?)superclass, methods);
             environment.assign(expr.name, cls);
             return null;
         }
@@ -379,6 +404,28 @@ namespace lox
         public object? visitThisExpr(Expr.This expr)
         {
             return lookupVariable(expr.keyword, expr);
+        }
+
+        public object? visitSuperExpr(Expr.Super expr)
+        {
+            var distance = 0;
+            locals.TryGetValue(expr, out distance);
+            var superclass = environment.getAt(distance, "super");
+            if (superclass == null)
+            {
+                throw new RuntimeError(expr.method, $"'super' not found at property '{expr.method.lexeme}'.");
+            }
+            var obj = environment.getAt(distance - 1, "this");
+            if (obj == null)
+            {
+                throw new RuntimeError(expr.method, $"not found 'this' at property '{expr.method.lexeme}'");
+            }
+            var method = ((LoxClass)superclass).findMethod(expr.method.lexeme);
+            if (method == null)
+            {
+                throw new RuntimeError(expr.method, $"undefined property '{expr.method.lexeme}'.");
+            }
+            return method.bind((LoxInstance)obj);
         }
     }
 }

@@ -34,9 +34,10 @@ namespace lox
         }
         public class Class : Stmt
         {
-            public Class(Token name, List<Stmt.Function> methods)
+            public Class(Token name, Expr.Variable? superclass, List<Stmt.Function> methods)
             {
                 this.name = name;
+                this.superclass = superclass;
                 this.methods = methods;
             }
             public override R accept<R>(Visitor<R> visitor)
@@ -44,6 +45,7 @@ namespace lox
                 return visitor.visitClassStmt(this);
             }
             public readonly Token name;
+            public readonly Expr.Variable? superclass;
             public readonly List<Stmt.Function> methods;
         }
         public class Expression : Stmt

@@ -9,10 +9,12 @@ namespace lox
     public class LoxClass : LoxCallable
     {
         private readonly string name;
+        private LoxClass? superclass;
         private readonly Dictionary<string, LoxFunction> methods = new Dictionary<string, LoxFunction>();
-        public LoxClass(string name, Dictionary<string, LoxFunction> methods)
+        public LoxClass(string name, LoxClass? superclass, Dictionary<string, LoxFunction> methods)
         {
             this.name = name;
+            this.superclass = superclass;
             this.methods = methods;
         }
         public LoxFunction? findMethod(string name)
@@ -20,6 +22,10 @@ namespace lox
             if (methods.ContainsKey(name))
             {
                 return methods[name];
+            }
+            if (superclass != null)
+            {
+                return superclass.findMethod(name);
             }
             return null;
         }
